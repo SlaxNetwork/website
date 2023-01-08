@@ -1,4 +1,5 @@
-import Layout from '../components/Layout'
+import { Space, Text } from '@mantine/core'
+import {Layout} from '../components/Layout'
 
 export default function Home() {
 
@@ -7,7 +8,12 @@ export default function Home() {
 
     <Layout page="Home">
       <div>
-        Ultimate gaming
+        <Text sx={{
+          "marginTop":"50px",
+          "marginLeft":"100px"
+        }}>
+          Oh my gosh
+        </Text>
       </div>
     </Layout>
 

@@ -1,15 +1,14 @@
-import { Image, Space } from "@mantine/core"
+import { Image, Space, Burger, Center } from "@mantine/core"
 import NavLink from "./NavLink"
 import Head from "next/head"
+import { useState, useEffect } from 'react';
 
 type Props = {
     page: string,
     children: JSX.Element
 }
 
-const Layout: React.FC<Props> = ({page, children}) => {
-
-
+export const Layout: React.FC<Props> = ({page, children}) => {
 
     var pages = {
         "home":"/",
@@ -19,13 +18,128 @@ const Layout: React.FC<Props> = ({page, children}) => {
     }
 
     var links = []
+    var mlinks = []
 
     for(const [name, url] of Object.entries(pages)){
         links.push(<>
             <NavLink name={name} link={url} active={page.toUpperCase()==name.toUpperCase()}/>      
             <Space w="xl" />          
         </>)
+        mlinks.push(<>
+            <NavLink name={name} link={url} active={page.toUpperCase()==name.toUpperCase()}/>
+            <Space h="sm"/>
+        </>)
     }
+
+    const [showNavbar, setShowNavbar] = useState(false)
+
+    const handleShowNavbar = () => {
+      setShowNavbar(!showNavbar)
+    }
+
+    const size = useWindowSize();
+
+    const navBar = size.width>1000?(
+        <div style={{
+            "backgroundImage":"url('/minecraft.png')",
+            "backgroundSize":"cover",
+            "height": "100vh",
+            "width": "100vw",
+            "marginTop": "0",
+          }}>
+            <div style={{
+              "height": "100vh",
+              "width": "100vw",
+              "marginTop": "0",
+              "padding": ""
+            }}>
+                <div style={{
+                    "backgroundColor": "rgba(0, 0, 0, 0.3)",
+                    "marginTop": "0",
+                    "padding": "2px"
+                }}>
+                        <div style={{
+                            "paddingLeft":"100px",
+                            "display":"flex",
+                            "alignItems":"center",
+                            "justifyContent":"left"
+                        }}>
+                            <Image src={"/SLAX.png"} width={150} style={{
+                            "marginRight":"60px"
+                            }}/>
+        
+    
+                            {links}
+                        
+                        </div>
+                </div>
+            <div>
+              {children}
+            </div>
+            </div>
+          </div>
+    ):(
+        <div style={{
+            "backgroundImage":"url('/minecraft.png')",
+            "backgroundSize":"cover",
+            "height": "100vh",
+            "width": "100vw",
+            "marginTop": "0",
+          }}>
+            <div style={{
+              "height": "100vh",
+              "width": "100vw",
+              "marginTop": "0",
+              "padding": ""
+            }}>
+                <div style={{
+                    "backgroundColor": "rgba(0, 0, 0, 0.3)",
+                    "marginTop": "0",
+                    "padding": "",
+                }}>
+                        <div style={{
+                            "paddingLeft":"30px",
+                            "display":"flex",
+                            "alignItems":"center",
+                            "height":"60px"
+                        }}>
+                             <Burger
+                                    opened={showNavbar}
+                                    onClick={() => setShowNavbar((o) => !o)}
+                                    title={"Open navication"}
+                                    aria-label={"Open Navigation"}
+                                    size={"lg"}
+                                    color={"#cd4909"}
+                                />  
+                                <Image src={"/SLAX.png"} width={150} style={{"marginLeft":"auto", "marginRight":"auto", "position":"absolute", "left":"0", "right":"0", "textAlign":"center"}}/>
+
+                        </div>
+
+                        { showNavbar && 
+                        
+                        <div style={{
+                            "textAlign":"center",
+                            "paddingTop":"20px",
+                            "position":"absolute",
+                            "left":"0",
+                            "right":"0",
+                            "marginRight":"auto",
+                            "marginLeft":"auto",
+                            "backgroundColor": "rgba(0, 0, 0, 0.3)",
+                            }}>
+                                {mlinks}
+                        </div>
+
+                        }
+
+
+                </div>
+            <div>
+              {children}
+            </div>
+            </div>
+          </div>
+    )
 
     return (
         <>
@@ -36,48 +150,42 @@ const Layout: React.FC<Props> = ({page, children}) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      <div style={{
-        "backgroundImage":"url('/minecraft.png')",
-        "backgroundSize":"cover",
-        "height": "100vh",
-        "width": "100vw",
-        "marginTop": "0",
-      }}>
-        <div style={{
-          "height": "100vh",
-          "width": "100vw",
-          "marginTop": "0",
-          "padding": "2px"
-        }}>
-            <div style={{
-                "backgroundColor": "rgba(0, 0, 0, 0.3)",
-                "marginTop": "0",
-                "padding": "2px"
-            }}>
-                    <div style={{
-                        "paddingLeft":"100px",
-                        "display":"flex",
-                        "alignItems":"center",
-                        "justifyContent":"left"
-                    }}>
-                        <Image src={"/SLAX.png"} width={150} style={{
-                        "marginRight":"60px"
-                        }}/>
-    
+        {navBar}
 
-                        {links}
-    
-                    </div>
-            </div>
-        <div>
-          {children}
-        </div>
-        </div>
-      </div>
+
       </>
 
     )
 
 }
 
-export default Layout
+function useWindowSize() {
+    // Initialize state with undefined width/height so server and client renders match
+    // Learn more here: https://joshwcomeau.com/react/the-perils-of-rehydration/
+    const [windowSize, setWindowSize] = useState({
+      width: undefined,
+      height: undefined,
+    });
+  
+    useEffect(() => {
+      // only execute all the code below in client side
+      // Handler to call on window resize
+      function handleResize() {
+        // Set window width/height to state
+        setWindowSize({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+      }
+      
+      // Add event listener
+      window.addEventListener("resize", handleResize);
+       
+      // Call handler right away so state gets updated with initial window size
+      handleResize();
+      
+      // Remove event listener on cleanup
+      return () => window.removeEventListener("resize", handleResize);
+    }, []); // Empty array ensures that effect is only run on mount
+    return windowSize;
+  }
